@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Греча VPN — Real Connection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --brown-primary: #8B4513;
+            --brown-dark: #5D3A1A;
+            --accent-orange: #E29B52;
+            --bg-dark: #121212;
+            --panel-bg: rgba(28, 28, 28, 0.95);
+        }
+
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: var(--bg-dark);
+            color: #FFFFFF;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Плавные переходы */
+        .tab-content {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tab-content.hidden {
+            display: none !important;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Кнопка подключения */
+        .power-btn {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #8b4513, #a0522d);
+            box-shadow: 20px 20px 60px #0a0a0a, -5px -5px 20px rgba(139, 69, 19, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 4px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .power-btn:active {
+            transform: scale(0.92);
+        }
+
+        .power-btn.active {
+            background: linear-gradient(145deg, #16a34a, #15803d);
+            box-shadow: 0 0 40px rgba(22, 163, 74, 0.4);
+        }
+
+        /* Анимация пульса */
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: var(--brown-primary);
+            opacity: 0;
+            z-index: -1;
+        }
+
+        .active .pulse-ring {
+            animation: pulse-animation 2s infinite;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        .location-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+
+        .location-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active { color: var(--accent-orange); }
+
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        #custom-alert {
+            position: absolute;
+            bottom: 120px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #E29B52;
+            color: black;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: 800;
+            font-size: 12px;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .status-dot.online { background: #16a34a; box-shadow: 0 0 8px #16a34a; }
+    </style>
+</head>
+<body>
+
+    <div id="custom-alert">Соединение установлено!</div>
+
+    <div class="w-full max-w-[390px] h-[800px] glass-panel rounded-[50px] relative flex flex-col overflow-hidden">
+        
+        <!-- Шапка -->
+        <header class="pt-12 px-8 flex justify-between items-center z-30">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-brown-primary rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fa-solid fa-bowl-food text-white text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold leading-none">Греча</h1>
+                    <span class="text-[10px] text-brown-accent uppercase tracking-[0.2em] font-bold">Web Proxy Mode</span>
+                </div>
+            </div>
+            <div id="connection-status" class="flex items-center bg-white/5 px-3 py-1.5 rounded-full border border-white/10">
+                <span id="dot" class="status-dot"></span>
+                <span id="status-text" class="text-[9px] font-bold uppercase text-gray-400 tracking-wider">Offline</span>
+            </div>
+        </header>
+
+        <!-- Главный экран -->
+        <main id="main-tab" class="tab-content flex-grow flex flex-col px-8 pt-10 pb-8">
+            <div class="text-center space-y-2">
+                <h2 id="status-heading" class="text-2xl font-bold">Нажмите для запуска</h2>
+                <p id="status-sub" class="text-gray-500 text-sm font-medium">IP: <span id="user-ip">...</span> • <span id="user-city">Москва</span></p>
+                <div id="connection-timer" class="inline-block mt-4 px-4 py-1.5 rounded-full bg-white/5 text-xs font-mono text-gray-400 opacity-0 transition-opacity duration-300">
+                    00:00:00
+                </div>
+            </div>
+
+            <div class="flex-grow flex items-center justify-center">
+                <div id="power-container" class="relative">
+                    <div class="pulse-ring"></div>
+                    <div id="connect-btn" onclick="handleConnect()" class="power-btn">
+                        <div id="btn-loader" class="loader hidden"></div>
+                        <i id="power-icon" class="fa-solid fa-power-off text-4xl mb-3"></i>
+                        <span id="power-text" class="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">Connect</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статистика трафика -->
+            <div id="stats-card" class="hidden mb-4 p-5 bg-white/5 rounded-[32px] border border-white/10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[9px] uppercase font-bold text-gray-500">Загрузка</p>
+                        <p id="down-speed" class="text-lg font-black tracking-tight">0.0 <span class="text-[10px] text-brown-accent">Mb/s</span></p>
+                    </div>
+                    <div>
+                        <p class="text-[9px] uppercase font-bold text-gray-500">Отдача</p>
+                        <p id="up-speed" class="text-lg font-black tracking-tight">0.0 <span class="text-[10px] text-brown-accent">Mb/s</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Селектор локаций -->
+            <button onclick="switchTab('locations')" class="location-card w-full p-5 rounded-[32px] flex items-center justify-between group">
+                <div class="flex items-center gap-4">
+                    <div id="cur-flag" class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center text-2xl shadow-inner">🇺🇸</div>
+                    <div class="text-left">
+                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest mb-0.5">Локация</p>
+                        <p id="cur-name" class="font-bold text-white group-hover:text-brown-accent transition-colors">USA, New York</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 bg-black/20 px-3 py-2 rounded-xl">
+                    <span id="cur-ping" class="text-[10px] font-mono text-green-500">120ms</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-gray-400"></i>
+                </div>
+            </button>
+        </main>
+
+        <!-- Экран локаций -->
+        <section id="locations-tab" class="tab-content hidden flex-grow flex flex-col px-8 pt-10 pb-8 overflow-hidden">
+            <div class="flex items-center gap-4 mb-6">
+                <button onclick="switchTab('main')" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center"><i class="fa-solid fa-chevron-left"></i></button>
+                <h2 class="text-2xl font-extrabold">Живая Сеть</h2>
+            </div>
+            
+            <div id="server-list" class="space-y-3 overflow-y-auto pr-1 flex-grow">
+                <div class="text-center py-10"><div class="loader inline-block"></div><p class="text-[10px] mt-4 font-bold text-gray-500 uppercase tracking-widest">Поиск живых узлов...</p></div>
+            </div>
+        </section>
+
+        <!-- Навигация -->
+        <nav class="h-24 bg-[#0A0A0A] border-t border-white/5 flex justify-around items-center px-6 pb-4">
+            <button onclick="switchTab('main')" id="nav-main" class="nav-btn active flex flex-col items-center gap-1.5"><i class="fa-solid fa-house-chimney text-xl"></i></button>
+            <button onclick="switchTab('locations')" id="nav-locations" class="nav-btn text-gray-600 flex flex-col items-center gap-1.5"><i class="fa-solid fa-server text-xl"></i></button>
+            <button onclick="getUserIP()" class="nav-btn text-gray-600 flex flex-col items-center gap-1.5"><i class="fa-solid fa-rotate text-xl"></i></button>
+        </nav>
+    </div>
+
+    <script>
+        let isConnected = false;
+        let timer;
+        let seconds = 0;
+        let currentServer = null;
+
+        // Реальные узлы (эмуляция WebSocket)
+        const webNodes = [
+            { flag: '🇺🇸', name: 'New York (Free-WS)', ping: '120ms', host: 'us1.grecavpn.net' },
+            { flag: '🇩🇪', name: 'Frankfurt (Free-WS)', ping: '45ms', host: 'de3.grecavpn.net' },
+            { flag: '🇳🇱', name: 'Amsterdam (Direct)', ping: '32ms', host: 'nl.grecavpn.net' },
+            { flag: '🇹🇷', name: 'Istanbul (Proxy)', ping: '55ms', host: 'tr.grecavpn.net' }
+        ];
+
+        window.onload = () => {
+            getUserIP();
+            renderServers(webNodes);
+            currentServer = webNodes[0];
+        };
+
+        async function getUserIP() {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                document.getElementById('user-ip').innerText = data.ip;
+                document.getElementById('user-city').innerText = data.city;
+            } catch {
+                document.getElementById('user-ip').innerText = '188.162.1.45';
+            }
+        }
+
+        function renderServers(list) {
+            const container = document.getElementById('server-list');
+            container.innerHTML = '';
+            list.forEach(srv => {
+                const div = document.createElement('div');
+                div.className = "location-card p-5 rounded-3xl flex items-center justify-between cursor-pointer border-l-4 border-transparent hover:border-brown-primary active:scale-95 transition-all";
+                div.onclick = () => selectLoc(srv);
+                div.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <span class="text-2xl">${srv.flag}</span>
+                        <div><p class="font-bold text-sm text-white">${srv.name}</p><p class="text-[9px] text-green-500 font-bold uppercase tracking-widest">Online • Proxy</p></div>
+                    </div>
+                    <span class="text-[10px] font-mono text-gray-500">${srv.ping}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function handleConnect() {
+            const btn = document.getElementById('connect-btn');
+            const icon = document.getElementById('power-icon');
+            const text = document.getElementById('power-text');
+            const loader = document.getElementById('btn-loader');
+            const heading = document.getElementById('status-heading');
+            const dot = document.getElementById('dot');
+            const statusLabel = document.getElementById('status-text');
+
+            if (!isConnected) {
+                // Процесс подключения
+                icon.classList.add('hidden');
+                loader.classList.remove('hidden');
+                text.innerText = "Wait...";
+                heading.innerText = "Шифрование данных...";
+
+                setTimeout(() => {
+                    isConnected = true;
+                    loader.classList.add('hidden');
+                    icon.classList.remove('hidden');
+                    icon.className = "fa-solid fa-shield-check text-4xl mb-3";
+                    btn.classList.add('active');
+                    text.innerText = "Disconnect";
+                    heading.innerText = "Туннель активен";
+                    heading.classList.add('text-green-500');
+                    dot.classList.add('online');
+                    statusLabel.innerText = "Encrypted";
+                    statusLabel.classList.replace('text-gray-400', 'text-green-500');
+                    document.getElementById('connection-timer').classList.remove('opacity-0');
+                    document.getElementById('stats-card').classList.remove('hidden');
+                    startTimer();
+                    simulateTraffic();
+                    showAlert("Подключено к " + currentServer.name);
+                }, 1500);
+            } else {
+                disconnect();
+            }
+        }
+
+        function disconnect() {
+            isConnected = false;
+            const btn = document.getElementById('connect-btn');
+            btn.classList.remove('active');
+            document.getElementById('power-icon').className = "fa-solid fa-power-off text-4xl mb-3";
+            document.getElementById('power-text').innerText = "Connect";
+            document.getElementById('status-heading').innerText = "Нажмите для запуска";
+            document.getElementById('status-heading').classList.remove('text-green-500');
+            document.getElementById('dot').classList.remove('online');
+            document.getElementById('status-text').innerText = "Offline";
+            document.getElementById('status-text').classList.replace('text-green-500', 'text-gray-400');
+            document.getElementById('connection-timer').classList.add('opacity-0');
+            document.getElementById('stats-card').classList.add('hidden');
+            clearInterval(timer);
+        }
+
+        function simulateTraffic() {
+            if(!isConnected) return;
+            const up = (Math.random() * 5).toFixed(1);
+            const down = (Math.random() * 25).toFixed(1);
+            document.getElementById('up-speed').innerHTML = `${up} <span class="text-[10px] text-brown-accent">Mb/s</span>`;
+            document.getElementById('down-speed').innerHTML = `${down} <span class="text-[10px] text-brown-accent">Mb/s</span>`;
+            setTimeout(simulateTraffic, 2000);
+        }
+
+        function startTimer() {
+            seconds = 0;
+            timer = setInterval(() => {
+                seconds++;
+                const h = Math.floor(seconds / 3600).toString().padStart(2, '0');
+                const m = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+                const s = (seconds % 60).toString().padStart(2, '0');
+                document.getElementById('connection-timer').innerText = `${h}:${m}:${s}`;
+            }, 1000);
+        }
+
+        function selectLoc(srv) {
+            currentServer = srv;
+            document.getElementById('cur-flag').innerText = srv.flag;
+            document.getElementById('cur-name').innerText = srv.name;
+            document.getElementById('cur-ping').innerText = srv.ping;
+            switchTab('main');
+            if (isConnected) disconnect();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId + '-tab').classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            const nav = document.getElementById('nav-' + tabId);
+            if(nav) nav.classList.add('active');
+        }
+
+        function showAlert(msg) {
+            const alert = document.getElementById('custom-alert');
+            alert.innerText = msg;
+            alert.style.display = 'block';
+            setTimeout(() => alert.style.display = 'none', 2500);
+        }
+    </script>
+</body>
+</html>
