@@ -42,40 +42,55 @@
             flex-direction: column;
         }
 
+        /* Шапка (Header) */
+        .app-header {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            padding: 24px 24px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            background: linear-gradient(to bottom, var(--dark-bg) 70%, transparent);
+        }
+
         /* Страницы */
         .page {
             position: absolute;
             inset: 0;
             padding: 20px;
-            padding-top: 70px;
+            padding-top: 100px; /* Отступ под шапку */
+            padding-bottom: 100px; /* Отступ под навигацию */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
             display: flex;
             flex-direction: column;
             background: var(--dark-bg);
+            overflow-y: auto;
         }
 
         .page.hidden {
-            transform: translateY(20px);
+            transform: translateY(30px);
             opacity: 0;
             pointer-events: none;
         }
 
         /* Кнопка питания */
         .power-orbit {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
-            border: 2px dashed rgba(139, 69, 19, 0.2);
+            border: 1px solid rgba(139, 69, 19, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
-            margin: 40px auto;
+            margin: 20px auto;
         }
 
         .power-button {
-            width: 150px;
-            height: 150px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
             background: linear-gradient(145deg, #8B4513, #5D3A1A);
             display: flex;
@@ -83,16 +98,16 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.4s ease;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 15px 45px rgba(0,0,0,0.8);
+            z-index: 20;
             border: 4px solid rgba(255,255,255,0.05);
         }
 
         .power-button.active {
             background: linear-gradient(145deg, #16a34a, #15803d);
-            box-shadow: 0 0 50px rgba(22, 163, 74, 0.4);
-            transform: scale(1.05);
+            box-shadow: 0 0 60px rgba(22, 163, 74, 0.5);
+            transform: scale(1.08);
         }
 
         /* Пульсация */
@@ -106,79 +121,121 @@
             z-index: 1;
         }
 
-        .active + .ripple {
-            animation: ripple-effect 2s infinite;
+        .active-ripple {
+            animation: ripple-effect 2.5s infinite;
         }
 
         @keyframes ripple-effect {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.7); opacity: 0; }
+            0% { transform: scale(1); opacity: 0.4; }
+            100% { transform: scale(1.8); opacity: 0; }
         }
 
-        /* Навигация */
+        /* Навигация СНИЗУ */
         .nav-bar {
-            height: 85px;
-            background: rgba(20, 20, 20, 0.98);
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 90px;
+            background: rgba(26, 26, 26, 0.95);
+            backdrop-filter: blur(10px);
             border-top: 1px solid rgba(255,255,255,0.05);
             display: flex;
             justify-content: space-around;
             align-items: center;
-            padding-bottom: 15px;
-            z-index: 100;
+            padding-bottom: 20px;
+            z-index: 1000;
         }
 
         .nav-btn {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
-            color: #555;
-            font-size: 11px;
-            font-weight: 700;
+            gap: 6px;
+            color: #666;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
             transition: 0.3s;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 80px;
         }
 
-        .nav-btn.active { color: var(--accent-orange); }
+        .nav-btn i { font-size: 20px; }
+
+        .nav-btn.active { 
+            color: var(--accent-orange); 
+            transform: translateY(-2px);
+        }
 
         .glass-card {
             background: var(--card-bg);
             border-radius: 24px;
-            padding: 18px;
-            border: 1px solid rgba(255,255,255,0.03);
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.04);
+            margin-bottom: 14px;
         }
 
+        /* Переключатель */
+        .switch {
+            width: 44px;
+            height: 24px;
+            background: #333;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .switch::after {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: 0.3s;
+        }
+        .switch.on { background: #16a34a; }
+        .switch.on::after { left: 23px; }
+
         .loader {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #fff;
+            border-top-color: var(--accent-orange);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        ::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
 
     <div class="app-shell">
         
-        <!-- Header -->
-        <div class="absolute top-0 w-full px-6 pt-6 flex justify-between items-center z-50">
+        <!-- Логотип и статус всегда видны -->
+        <header class="app-header">
             <div class="flex items-center gap-2">
                 <i class="fa-solid fa-bowl-food text-amber-700 text-2xl"></i>
-                <span class="font-black text-lg tracking-tighter italic">ГРЕЧА VPN</span>
+                <span class="font-black text-xl tracking-tighter italic">ГРЕЧА</span>
             </div>
-            <div id="status-badge" class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-gray-500 uppercase">
+            <div id="status-badge" class="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-gray-500 uppercase tracking-widest">
                 Offline
             </div>
-        </div>
+        </header>
 
-        <!-- ГЛАВНЫЙ ЭКРАН -->
+        <!-- СТРАНИЦА: ГЛАВНАЯ -->
         <div id="home-page" class="page">
-            <div class="text-center mt-6">
-                <h2 id="status-title" class="text-2xl font-extrabold">Готов к работе</h2>
-                <p class="text-gray-500 text-xs mt-1">IP: <span id="user-ip">...</span></p>
+            <div class="text-center">
+                <h2 id="status-title" class="text-2xl font-black">Готов к работе</h2>
+                <p class="text-gray-500 text-xs mt-1 font-bold">IP: <span id="user-ip" class="font-mono">...</span></p>
             </div>
 
             <div class="power-orbit">
@@ -187,61 +244,93 @@
                     <i id="p-icon" class="fa-solid fa-power-off text-3xl mb-1"></i>
                     <span id="p-text" class="text-[9px] font-black uppercase tracking-widest">Connect</span>
                 </div>
-                <div class="ripple"></div>
+                <div id="ripple-el" class="ripple"></div>
             </div>
 
-            <!-- Статистика -->
-            <div id="stats" class="grid grid-cols-2 gap-3 opacity-20 transition-opacity duration-500">
+            <div id="stats" class="grid grid-cols-2 gap-3 opacity-20 transition-all duration-700 transform translate-y-4">
                 <div class="glass-card">
-                    <span class="text-[9px] font-bold text-gray-500 uppercase">Download</span>
-                    <div class="text-xl font-black mt-1"><span id="speed-down">0.0</span> <small class="text-[10px] text-amber-600">Mb/s</small></div>
+                    <span class="text-[10px] font-black text-gray-500 uppercase">Download</span>
+                    <div class="text-2xl font-black mt-1"><span id="speed-down">0.0</span> <small class="text-xs text-amber-600">Mb/s</small></div>
                 </div>
                 <div class="glass-card">
-                    <span class="text-[9px] font-bold text-gray-500 uppercase">Upload</span>
-                    <div class="text-xl font-black mt-1"><span id="speed-up">0.0</span> <small class="text-[10px] text-amber-600">Mb/s</small></div>
+                    <span class="text-[10px] font-black text-gray-500 uppercase">Upload</span>
+                    <div class="text-2xl font-black mt-1"><span id="speed-up">0.0</span> <small class="text-xs text-amber-600">Mb/s</small></div>
                 </div>
             </div>
 
-            <!-- Выбор сервера -->
             <div class="mt-auto mb-4">
-                <div onclick="showServers()" class="glass-card flex items-center justify-between active:scale-95 transition-transform cursor-pointer">
+                <div onclick="showServers()" class="glass-card flex items-center justify-between active:scale-95 transition-transform cursor-pointer border-amber-900/30">
                     <div class="flex items-center gap-4">
-                        <span id="srv-flag" class="text-2xl">🇳🇱</span>
+                        <span id="srv-flag" class="text-3xl">🇳🇱</span>
                         <div>
-                            <p class="text-[9px] text-gray-500 font-bold uppercase">Активный узел</p>
-                            <p id="srv-name" class="font-bold text-sm">Netherlands, Amsterdam</p>
+                            <p class="text-[9px] text-amber-600 font-black uppercase">Текущая локация</p>
+                            <p id="srv-name" class="font-extrabold text-sm">Netherlands, Amsterdam</p>
                         </div>
                     </div>
-                    <i class="fa-solid fa-angle-right text-gray-600"></i>
+                    <i class="fa-solid fa-chevron-right text-gray-700"></i>
                 </div>
             </div>
         </div>
 
-        <!-- СПИСОК СЕРВЕРОВ -->
-        <div id="server-page" class="page hidden overflow-y-auto">
-            <div class="flex items-center gap-4 mb-6">
-                <button onclick="showHome()" class="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <h2 class="text-xl font-extrabold">Выбор локации</h2>
-            </div>
-            <div id="list-container" class="space-y-3">
-                <!-- JS render -->
+        <!-- СТРАНИЦА: СЕРВЕРА -->
+        <div id="server-page" class="page hidden">
+            <h2 class="text-2xl font-black mb-6">Локации</h2>
+            <div id="list-container" class="space-y-1">
+                <!-- Контент генерируется JS -->
             </div>
         </div>
 
-        <!-- Навигация -->
+        <!-- СТРАНИЦА: ОПЦИИ -->
+        <div id="settings-page" class="page hidden">
+            <h2 class="text-2xl font-black mb-6">Настройки</h2>
+            
+            <div class="glass-card flex justify-between items-center">
+                <div>
+                    <p class="font-bold">Kill Switch</p>
+                    <p class="text-[10px] text-gray-500 font-bold">Защита от утечек IP</p>
+                </div>
+                <div class="switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+
+            <div class="glass-card flex justify-between items-center border-amber-500/10">
+                <div>
+                    <p class="font-bold">Smart Routing</p>
+                    <p class="text-[10px] text-gray-500 font-bold">Только заблокированные сайты</p>
+                </div>
+                <div class="switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+
+            <div class="glass-card">
+                <p class="text-[10px] text-gray-500 font-black uppercase mb-3">Протокол передачи</p>
+                <div class="space-y-2">
+                    <label class="flex items-center justify-between p-2 rounded-lg bg-white/5">
+                        <span class="text-sm font-bold">VLESS + Reality</span>
+                        <input type="radio" name="proto" checked class="accent-amber-600">
+                    </label>
+                    <label class="flex items-center justify-between p-2 rounded-lg bg-white/5 opacity-40">
+                        <span class="text-sm font-bold">Shadowsocks</span>
+                        <input type="radio" name="proto" class="accent-amber-600">
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-auto p-4 text-center">
+                <p class="text-[10px] text-gray-700 font-black">ВЕРСИЯ 2.4.0 (GRECHA-ENGINE)</p>
+            </div>
+        </div>
+
+        <!-- Навигация СНИЗУ -->
         <nav class="nav-bar">
             <button onclick="showHome()" id="n-home" class="nav-btn active">
-                <i class="fa-solid fa-house-user text-xl"></i>
+                <i class="fa-solid fa-house"></i>
                 <span>Главная</span>
             </button>
             <button onclick="showServers()" id="n-srv" class="nav-btn">
-                <i class="fa-solid fa-server text-xl"></i>
+                <i class="fa-solid fa-earth-europe"></i>
                 <span>Сервера</span>
             </button>
-            <button class="nav-btn opacity-30">
-                <i class="fa-solid fa-gear text-xl"></i>
+            <button onclick="showSettings()" id="n-set" class="nav-btn">
+                <i class="fa-solid fa-sliders"></i>
                 <span>Опции</span>
             </button>
         </nav>
@@ -250,105 +339,143 @@
     <script>
         let connected = false;
         let speedTimer;
+        let realIp = 'Загрузка...';
 
         const serverData = [
-            { id: 1, name: 'Netherlands, Amsterdam', flag: '🇳🇱', ping: '32ms' },
-            { id: 2, name: 'Germany, Frankfurt', flag: '🇩🇪', ping: '41ms' },
-            { id: 3, name: 'USA, New York', flag: '🇺🇸', ping: '108ms' },
-            { id: 4, name: 'Turkey, Istanbul', flag: '🇹🇷', ping: '55ms' }
+            { id: 1, name: 'Netherlands, Amsterdam', flag: '🇳🇱', host: '94.232.11.21', ping: '32ms' },
+            { id: 2, name: 'Germany, Frankfurt', flag: '🇩🇪', host: '45.155.204.14', ping: '41ms' },
+            { id: 3, name: 'USA, New York', flag: '🇺🇸', host: '198.51.100.1', ping: '115ms' },
+            { id: 4, name: 'Turkey, Istanbul', flag: '🇹🇷', host: '176.236.12.55', ping: '58ms' },
+            { id: 5, name: 'Kazakhstan, Almaty', flag: '🇰🇿', host: '95.161.224.10', ping: '25ms' }
         ];
 
         window.onload = () => {
             renderServers();
-            fetch('https://api.ipify.org?format=json')
-                .then(res => res.json())
-                .then(data => document.getElementById('user-ip').innerText = data.ip)
-                .catch(() => document.getElementById('user-ip').innerText = '109.252.xx.xx');
+            fetchIp();
         };
+
+        async function fetchIp() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                realIp = data.ip;
+                if(!connected) document.getElementById('user-ip').innerText = realIp;
+            } catch (e) {
+                realIp = '109.252.xx.xx';
+                document.getElementById('user-ip').innerText = realIp;
+            }
+        }
 
         function renderServers() {
             const container = document.getElementById('list-container');
             container.innerHTML = serverData.map(s => `
-                <div onclick="selectServer(${s.id})" class="glass-card flex justify-between items-center active:bg-white/5 transition-colors">
+                <div onclick="selectServer(${s.id})" class="glass-card flex justify-between items-center active:bg-white/5 transition-all cursor-pointer">
                     <div class="flex items-center gap-4">
-                        <span class="text-2xl">${s.flag}</span>
+                        <span class="text-3xl">${s.flag}</span>
                         <div>
-                            <p class="font-bold text-sm text-white">${s.name}</p>
-                            <p class="text-[9px] text-green-500 font-bold uppercase tracking-widest">Online • WSS</p>
+                            <p class="font-black text-sm text-white">${s.name}</p>
+                            <p class="text-[9px] text-amber-500 font-bold uppercase tracking-widest">Reality v2 • Стабильно</p>
                         </div>
                     </div>
-                    <span class="text-xs font-mono text-gray-500">${s.ping}</span>
+                    <div class="text-right">
+                        <span class="block text-xs font-mono font-bold text-gray-500">${s.ping}</span>
+                    </div>
                 </div>
             `).join('');
         }
 
         function toggleConnection() {
+            if (connected) disconnect(); else connect();
+        }
+
+        function connect() {
             const btn = document.getElementById('p-btn');
             const icon = document.getElementById('p-icon');
             const loader = document.getElementById('btn-loader');
             const text = document.getElementById('p-text');
             const badge = document.getElementById('status-badge');
             const title = document.getElementById('status-title');
+            const ripple = document.getElementById('ripple-el');
 
-            if (!connected) {
-                icon.classList.add('hidden');
-                loader.classList.remove('hidden');
-                text.innerText = "Connecting";
+            icon.classList.add('hidden');
+            loader.classList.remove('hidden');
+            text.innerText = "Handshake...";
+
+            setTimeout(() => {
+                connected = true;
+                loader.classList.add('hidden');
+                icon.classList.remove('hidden');
+                icon.className = "fa-solid fa-shield-halved text-3xl mb-1";
+                btn.classList.add('active');
+                ripple.classList.add('active-ripple');
+                text.innerText = "Stop";
+                title.innerText = "Защищено";
+                title.classList.add('text-green-500');
                 
-                setTimeout(() => {
-                    connected = true;
-                    loader.classList.add('hidden');
-                    icon.classList.remove('hidden');
-                    icon.className = "fa-solid fa-shield-check text-3xl mb-1";
-                    btn.classList.add('active');
-                    text.innerText = "Stop";
-                    title.innerText = "Подключено";
-                    title.classList.add('text-green-500');
-                    badge.innerText = "Protected";
-                    badge.className = "px-3 py-1 rounded-full bg-green-500/10 border border-green-500/20 text-[9px] font-black text-green-500 uppercase";
-                    document.getElementById('stats').classList.remove('opacity-20');
-                    startSpeedSim();
-                }, 1200);
-            } else {
-                connected = false;
-                btn.classList.remove('active');
-                icon.className = "fa-solid fa-power-off text-3xl mb-1";
-                text.innerText = "Connect";
-                title.innerText = "Готов к работе";
-                title.classList.remove('text-green-500');
-                badge.innerText = "Offline";
-                badge.className = "px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-gray-500 uppercase";
-                document.getElementById('stats').classList.add('opacity-20');
-                clearInterval(speedTimer);
-            }
+                badge.innerText = "Protected";
+                badge.classList.replace('text-gray-500', 'text-green-500');
+                badge.classList.add('bg-green-500/10', 'border-green-500/20');
+                
+                const activeSrv = serverData.find(s => s.flag === document.getElementById('srv-flag').innerText);
+                document.getElementById('user-ip').innerText = activeSrv ? activeSrv.host : '185.242.xx.xx';
+                document.getElementById('user-ip').classList.add('text-green-500');
+
+                document.getElementById('stats').classList.remove('opacity-20');
+                document.getElementById('stats').style.transform = "translateY(0)";
+                startSpeedSim();
+            }, 1500);
+        }
+
+        function disconnect() {
+            const btn = document.getElementById('p-btn');
+            const icon = document.getElementById('p-icon');
+            const text = document.getElementById('p-text');
+            const badge = document.getElementById('status-badge');
+            const title = document.getElementById('status-title');
+            const ripple = document.getElementById('ripple-el');
+
+            connected = false;
+            btn.classList.remove('active');
+            ripple.classList.remove('active-ripple');
+            icon.className = "fa-solid fa-power-off text-3xl mb-1";
+            text.innerText = "Connect";
+            title.innerText = "Готов к работе";
+            title.classList.remove('text-green-500');
+            
+            badge.innerText = "Offline";
+            badge.className = "px-3 py-1 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-gray-500 uppercase tracking-widest";
+            
+            document.getElementById('user-ip').innerText = realIp;
+            document.getElementById('user-ip').classList.remove('text-green-500');
+
+            document.getElementById('stats').classList.add('opacity-20');
+            document.getElementById('stats').style.transform = "translateY(16px)";
+            clearInterval(speedTimer);
         }
 
         function startSpeedSim() {
             speedTimer = setInterval(() => {
-                document.getElementById('speed-down').innerText = (Math.random() * 45 + 5).toFixed(1);
-                document.getElementById('speed-up').innerText = (Math.random() * 12 + 1).toFixed(1);
+                document.getElementById('speed-down').innerText = (Math.random() * 60 + 5).toFixed(1);
+                document.getElementById('speed-up').innerText = (Math.random() * 20 + 2).toFixed(1);
             }, 2000);
         }
 
-        function showServers() {
-            document.getElementById('home-page').classList.add('hidden');
-            document.getElementById('server-page').classList.remove('hidden');
-            document.getElementById('n-home').classList.remove('active');
-            document.getElementById('n-srv').classList.add('active');
+        function switchPage(pageId, btnId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(pageId).classList.remove('hidden');
+            document.getElementById(btnId).classList.add('active');
         }
 
-        function showHome() {
-            document.getElementById('server-page').classList.add('hidden');
-            document.getElementById('home-page').classList.remove('hidden');
-            document.getElementById('n-srv').classList.remove('active');
-            document.getElementById('n-home').classList.add('active');
-        }
+        function showHome() { switchPage('home-page', 'n-home'); }
+        function showServers() { switchPage('server-page', 'n-srv'); }
+        function showSettings() { switchPage('settings-page', 'n-set'); }
 
         function selectServer(id) {
             const s = serverData.find(x => x.id === id);
             document.getElementById('srv-flag').innerText = s.flag;
             document.getElementById('srv-name').innerText = s.name;
-            if(connected) toggleConnection();
+            if(connected) disconnect();
             showHome();
         }
     </script>
